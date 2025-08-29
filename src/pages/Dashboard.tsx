@@ -1,25 +1,18 @@
 import { useState, useEffect } from 'react';
-import { PositionsData, Snapshot } from '../types';
-import { fetchPositionsData, fetchSnapshots } from '../lib/dataReader';
+import { ComputedPortfolio } from '../types';
+import { computePortfolioFromTransactions } from '../lib/dataReader';
 import { formatCurrency, formatPLColor, formatDate } from '../lib/utils';
 
 function Dashboard() {
-  const [positions, setPositions] = useState<PositionsData | null>(null);
-  const [latestSnapshot, setLatestSnapshot] = useState<Snapshot | null>(null);
+  const [portfolio, setPortfolio] = useState<ComputedPortfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [positionsData, snapshotsData] = await Promise.all([
-          fetchPositionsData(),
-          fetchSnapshots()
-        ]);
-        setPositions(positionsData);
-        if (snapshotsData.length > 0) {
-          setLatestSnapshot(snapshotsData[snapshotsData.length - 1]);
-        }
+        const computedPortfolio = await computePortfolioFromTransactions();
+        setPortfolio(computedPortfolio);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load data');
       } finally {
@@ -48,7 +41,7 @@ function Dashboard() {
     );
   }
 
-  if (!positions) {
+  if (!portfolio) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
         <p className="text-yellow-800">No data available</p>
@@ -56,9 +49,9 @@ function Dashboard() {
     );
   }
 
-  const totalInvested = parseFloat(positions.total_quote_invested);
-  const totalMarketValue = latestSnapshot ? parseFloat(latestSnapshot.total_market_value) : 0;
-  const totalUnrealizedPL = latestSnapshot ? parseFloat(latestSnapshot.total_unrealized_pl) : 0;
+  const totalInvested = parseFloat(portfolio.total_quote_invested);
+  const totalMarketValue = parseFloat(portfolio.total_market_value);
+  const totalUnrealizedPL = parseFloat(portfolio.total_unrealized_pl);
   
   return (
     <div className="space-y-6">
@@ -68,29 +61,29 @@ function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {formatCurrency(totalInvested, positions.base_currency)}
+              {formatCurrency(totalInvested, portfolio.base_currency)}
             </p>
             <p className="text-sm text-gray-500">Total Invested</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {formatCurrency(totalMarketValue, positions.base_currency)}
+              {formatCurrency(totalMarketValue, portfolio.base_currency)}
             </p>
             <p className="text-sm text-gray-500">Market Value</p>
           </div>
           <div className="text-center">
             <p className={`text-2xl font-bold ${formatPLColor(totalUnrealizedPL)}`}>
-              {totalUnrealizedPL >= 0 ? '+' : ''}{formatCurrency(totalUnrealizedPL, positions.base_currency)}
+              {totalUnrealizedPL >= 0 ? '+' : ''}{formatCurrency(totalUnrealizedPL, portfolio.base_currency)}
             </p>
             <p className="text-sm text-gray-500">Unrealized P/L</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {positions.positions.length}
+              {portfolio.positions.length}
             </p>
             <p className="text-sm text-gray-500">Assets</p>
             <p className="text-xs text-gray-500 mt-1">
-              Updated: {formatDate(positions.updated_at)}
+              Updated: {formatDate(portfolio.last_updated)}
             </p>
           </div>
         </div>
@@ -129,16 +122,13 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {positions.positions.map((position, index) => {
-                const quantity = parseFloat(position.open_quantity || '0') || parseFloat(position.open_qty?.toString() || '0');
+              {portfolio.positions.map((position, index) => {
+                const quantity = parseFloat(position.open_quantity);
                 const totalCost = parseFloat(position.total_cost);
-                const avgCost = position.avg_cost ? parseFloat(position.avg_cost) : (quantity > 0 ? totalCost / quantity : 0);
-                
-                // Get market data from latest snapshot
-                const snapshotPosition = latestSnapshot?.positions.find(p => p.symbol === position.symbol);
-                const lastPrice = snapshotPosition ? parseFloat(snapshotPosition.price) : 0;
-                const marketValue = snapshotPosition ? parseFloat(snapshotPosition.market_value) : 0;
-                const unrealizedPL = snapshotPosition ? parseFloat(snapshotPosition.unrealized_pl) : 0;
+                const avgCost = parseFloat(position.avg_cost);
+                const lastPrice = parseFloat(position.price);
+                const marketValue = parseFloat(position.market_value);
+                const unrealizedPL = parseFloat(position.unrealized_pl);
                 
                 return (
                   <tr key={`${position.symbol}-${index}`} className="hover:bg-gray-50">
@@ -150,29 +140,29 @@ function Dashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {formatCurrency(avgCost, positions.base_currency)}
+                        {formatCurrency(avgCost, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {formatCurrency(totalCost, positions.base_currency)}
+                        {formatCurrency(totalCost, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {lastPrice > 0 ? formatCurrency(lastPrice, positions.base_currency) : '-'}
+                        {lastPrice > 0 ? formatCurrency(lastPrice, portfolio.base_currency) : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {marketValue > 0 ? formatCurrency(marketValue, positions.base_currency) : '-'}
+                        {marketValue > 0 ? formatCurrency(marketValue, portfolio.base_currency) : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className={`text-sm font-medium ${formatPLColor(unrealizedPL)}`}>
                         {unrealizedPL !== 0 ? (
                           <>
-                            {unrealizedPL > 0 ? '+' : ''}{formatCurrency(unrealizedPL, positions.base_currency)}
+                            {unrealizedPL > 0 ? '+' : ''}{formatCurrency(unrealizedPL, portfolio.base_currency)}
                           </>
                         ) : '-'}
                       </div>

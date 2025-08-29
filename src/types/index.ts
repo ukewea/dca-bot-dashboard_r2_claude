@@ -16,9 +16,9 @@ export interface PositionsData {
   positions: Position[];
 }
 
-export interface SnapshotPosition {
+export interface ComputedPosition {
   symbol: string;
-  open_qty: number;
+  open_quantity: string;
   total_cost: string;
   avg_cost: string;
   price: string;
@@ -26,13 +26,13 @@ export interface SnapshotPosition {
   unrealized_pl: string;
 }
 
-export interface Snapshot {
-  ts: string;
+export interface ComputedPortfolio {
   base_currency: string;
   total_quote_invested: string;
   total_market_value: string;
   total_unrealized_pl: string;
-  positions: SnapshotPosition[];
+  positions: ComputedPosition[];
+  last_updated: string;
 }
 
 export interface PriceData {
