@@ -327,7 +327,7 @@ function Charts() {
                 formatter={(value: number, name: string) => [
                   formatCurrency(value, baseCurrency),
                   name === 'invested' ? 'Invested' : 
-                  name === 'marketValue' ? 'Market Value' : 'P/L'
+                  name === 'marketValue' ? 'Market Value' : 'Unrealized P/L'
                 ]}
                 labelStyle={{ color: '#374151' }}
                 contentStyle={{ 
