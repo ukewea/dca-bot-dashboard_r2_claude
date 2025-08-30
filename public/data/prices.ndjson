@@ -252,3 +252,10 @@
 {"ts":"2025-08-30T02:02:59.152694553Z","symbol":"SUIUSDC","price":"3.2419","source":"binance_spot","iteration_id":"2025-08-30T02:02:58Z#2"}
 {"ts":"2025-08-30T02:02:59.200997897Z","symbol":"SOLUSDC","price":"201.58","source":"binance_spot","iteration_id":"2025-08-30T02:02:58Z#2"}
 {"ts":"2025-08-30T02:02:59.24884738Z","symbol":"BNBUSDC","price":"854.88","source":"binance_spot","iteration_id":"2025-08-30T02:02:58Z#2"}
+{"ts":"2025-08-30T03:02:58.887449698Z","symbol":"BTCUSDC","price":"107837.98","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
+{"ts":"2025-08-30T03:02:58.965104673Z","symbol":"ETHUSDC","price":"4309.67","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
+{"ts":"2025-08-30T03:02:59.011423436Z","symbol":"ADAUSDC","price":"0.8236","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
+{"ts":"2025-08-30T03:02:59.064422898Z","symbol":"DOGEUSDC","price":"0.2156","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
+{"ts":"2025-08-30T03:02:59.110769548Z","symbol":"SUIUSDC","price":"3.2685","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
+{"ts":"2025-08-30T03:02:59.165483214Z","symbol":"SOLUSDC","price":"203.28","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
+{"ts":"2025-08-30T03:02:59.237600411Z","symbol":"BNBUSDC","price":"857.26","source":"binance_spot","iteration_id":"2025-08-30T03:02:58Z#3"}
