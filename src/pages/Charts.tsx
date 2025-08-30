@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { ChartDataPoint, generateTimeSeriesFromTransactions } from '../lib/dataReader';
+import { ChartDataPoint, generateTimeSeriesFromTransactions, fetchTransactions } from '../lib/dataReader';
 import { formatCurrency, formatDateShort } from '../lib/utils';
 
 
@@ -18,12 +18,20 @@ function Charts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | 'all'>('all');
+  const [selectedSymbols, setSelectedSymbols] = useState<string[]>([]);
+  const [availableSymbols, setAvailableSymbols] = useState<string[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const data = await generateTimeSeriesFromTransactions();
         setChartData(data);
+        
+        // Extract available symbols from transaction data
+        const transactions = await fetchTransactions();
+        const symbols = Array.from(new Set(transactions.map(t => t.symbol))).sort();
+        setAvailableSymbols(symbols);
+        setSelectedSymbols(symbols); // Default to all symbols selected
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load chart data');
       } finally {
@@ -53,6 +61,20 @@ function Charts() {
     }
     
     return data.filter(point => new Date(point.timestamp) >= cutoff);
+  };
+
+  const toggleSymbol = (symbol: string) => {
+    setSelectedSymbols(prev => 
+      prev.includes(symbol) 
+        ? prev.filter(s => s !== symbol)
+        : [...prev, symbol]
+    );
+  };
+
+  const toggleAllSymbols = () => {
+    setSelectedSymbols(prev => 
+      prev.length === availableSymbols.length ? [] : [...availableSymbols]
+    );
   };
 
   const filteredChartData = filterDataByTimeRange(chartData).map(point => ({
@@ -114,6 +136,37 @@ function Charts() {
         </div>
 
 
+
+        {/* Symbol Filter */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-700">Filter by Assets</h3>
+            <button
+              onClick={toggleAllSymbols}
+              className="text-xs text-blue-600 hover:text-blue-700"
+            >
+              {selectedSymbols.length === availableSymbols.length ? 'Deselect All' : 'Select All'}
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableSymbols.map((symbol) => (
+              <button
+                key={symbol}
+                onClick={() => toggleSymbol(symbol)}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  selectedSymbols.includes(symbol)
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                }`}
+              >
+                {symbol}
+              </button>
+            ))}
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            {selectedSymbols.length} of {availableSymbols.length} assets selected
+          </div>
+        </div>
         {/* Current Stats */}
         {filteredChartData.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

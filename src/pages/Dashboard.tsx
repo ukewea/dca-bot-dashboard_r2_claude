@@ -90,9 +90,9 @@ function Dashboard() {
       </div>
 
       {/* Positions Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Current Positions</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Current Positions</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -131,30 +131,30 @@ function Dashboard() {
                 const unrealizedPL = parseFloat(position.unrealized_pl);
                 
                 return (
-                  <tr key={`${position.symbol}-${index}`} className="hover:bg-gray-50">
+                  <tr key={`${position.symbol}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{position.symbol}</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{position.symbol}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{quantity.toFixed(6)}</div>
+                      <div className="text-sm text-gray-900 dark:text-gray-300">{quantity.toFixed(6)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-gray-300">
                         {formatCurrency(avgCost, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-gray-300">
                         {formatCurrency(totalCost, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-gray-300">
                         {lastPrice > 0 ? formatCurrency(lastPrice, portfolio.base_currency) : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 dark:text-gray-300">
                         {marketValue > 0 ? formatCurrency(marketValue, portfolio.base_currency) : '-'}
                       </div>
                     </td>

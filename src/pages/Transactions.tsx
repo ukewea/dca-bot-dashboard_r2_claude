@@ -57,45 +57,45 @@ function Transactions() {
   }
 
   const totalSpent = filteredTransactions.reduce((sum, t) => sum + parseFloat(t.quote_spent), 0);
-  const averagePrice = filteredTransactions.length > 0 
-    ? filteredTransactions.reduce((sum, t) => sum + parseFloat(t.price), 0) / filteredTransactions.length 
+  const avgBuyAmount = filteredTransactions.length > 0 
+    ? totalSpent / filteredTransactions.length
     : 0;
 
   return (
     <div className="space-y-6">
       {/* Summary Stats */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Transaction Summary</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Transaction Summary</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">{filteredTransactions.length}</p>
-            <p className="text-sm text-gray-500">Total Transactions</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{filteredTransactions.length}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Total Transactions</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(totalSpent, 'USDC')}
             </p>
-            <p className="text-sm text-gray-500">Total Spent</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Total Spent</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {availableSymbols.length}
             </p>
-            <p className="text-sm text-gray-500">Assets Traded</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Assets Traded</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-gray-900">
-              {averagePrice > 0 ? formatCurrency(averagePrice, 'USDC') : '-'}
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {avgBuyAmount > 0 ? formatCurrency(avgBuyAmount, 'USDC') : '-'}
             </p>
-            <p className="text-sm text-gray-500">Avg Price</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Avg Buy Amount</p>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h3 className="text-md font-medium text-gray-900">Filter Transactions</h3>
+          <h3 className="text-md font-medium text-gray-900 dark:text-white">Filter Transactions</h3>
           <select
             value={selectedSymbol}
             onChange={(e) => setSelectedSymbol(e.target.value)}
@@ -106,52 +106,52 @@ function Transactions() {
               <option key={symbol} value={symbol}>{symbol}</option>
             ))}
           </select>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             Showing {filteredTransactions.length} of {transactions.length} transactions
           </div>
         </div>
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Transaction History</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Transaction History</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Time
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Asset
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Side
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Quantity
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Total
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Exchange
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredTransactions.map((transaction, index) => (
-                <tr key={`${transaction.ts}-${index}`} className="hover:bg-gray-50">
+                <tr key={`${transaction.ts}-${index}`} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(transaction.ts)}</div>
+                    <div className="text-sm text-gray-900 dark:text-gray-300">{formatDate(transaction.ts)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{transaction.symbol}</div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">{transaction.symbol}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -163,20 +163,20 @@ function Transactions() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
+                    <div className="text-sm text-gray-900 dark:text-gray-300">
                       {formatCurrency(transaction.price, 'USDC')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{parseFloat(transaction.qty).toFixed(6)}</div>
+                    <div className="text-sm text-gray-900 dark:text-gray-300">{parseFloat(transaction.qty).toFixed(6)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatCurrency(transaction.quote_spent, 'USDC')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       {transaction.exchange?.replace('_', ' ').toUpperCase() || '-'}
                     </div>
                   </td>
