@@ -111,9 +111,9 @@ function Charts() {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-4">
-          <h2 className="text-lg font-medium text-gray-900">Portfolio Performance</h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Portfolio Performance</h2>
           
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Time Range Selector */}
@@ -124,8 +124,8 @@ function Charts() {
                   onClick={() => setTimeRange(range)}
                   className={`px-3 py-1 rounded-md text-sm font-medium ${
                     timeRange === range
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   {range.toUpperCase()}
@@ -140,10 +140,10 @@ function Charts() {
         {/* Symbol Filter */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-gray-700">Filter by Assets</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Assets</h3>
             <button
               onClick={toggleAllSymbols}
-              className="text-xs text-blue-600 hover:text-blue-700"
+              className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
               {selectedSymbols.length === availableSymbols.length ? 'Deselect All' : 'Select All'}
             </button>
@@ -155,15 +155,15 @@ function Charts() {
                 onClick={() => toggleSymbol(symbol)}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                   selectedSymbols.includes(symbol)
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-800'
+                    : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600'
                 }`}
               >
                 {symbol}
               </button>
             ))}
           </div>
-          <div className="mt-2 text-xs text-gray-500">
+          <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
             {selectedSymbols.length} of {availableSymbols.length} assets selected
           </div>
         </div>
@@ -171,16 +171,16 @@ function Charts() {
         {filteredChartData.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].invested, baseCurrency)}
               </p>
-              <p className="text-sm text-gray-500">Total Invested</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total Invested</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].marketValue, baseCurrency)}
               </p>
-              <p className="text-sm text-gray-500">Market Value</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Market Value</p>
             </div>
             <div className="text-center">
               <p className={`text-lg font-semibold ${
@@ -188,7 +188,7 @@ function Charts() {
               }`}>
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].unrealizedPL, baseCurrency)}
               </p>
-              <p className="text-sm text-gray-500">Unrealized P/L</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Unrealized P/L</p>
             </div>
           </div>
         )}
