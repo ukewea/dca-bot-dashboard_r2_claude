@@ -326,8 +326,7 @@ function Charts() {
               <Tooltip 
                 formatter={(value: number, name: string) => [
                   formatCurrency(value, baseCurrency),
-                  name === 'invested' ? 'Invested' : 
-                  name === 'marketValue' ? 'Market Value' : 'Unrealized P/L'
+                  name // Use the name directly since Line components already have proper names
                 ]}
                 labelStyle={{ color: '#374151' }}
                 contentStyle={{ 
