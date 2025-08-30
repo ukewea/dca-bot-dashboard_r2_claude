@@ -9,29 +9,130 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { ChartDataPoint, generateTimeSeriesFromTransactions, fetchTransactions } from '../lib/dataReader';
+import { ChartDataPoint, generateTimeSeriesFromTransactions, fetchTransactions, Transaction, fetchPrices } from '../lib/dataReader';
 import { formatCurrency, formatDateShort } from '../lib/utils';
 
 
 function Charts() {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | 'all'>('all');
   const [selectedSymbols, setSelectedSymbols] = useState<string[]>([]);
   const [availableSymbols, setAvailableSymbols] = useState<string[]>([]);
 
+  // Function to generate time series with symbol filtering
+  const generateFilteredTimeSeries = async (symbolFilter: string[]): Promise<ChartDataPoint[]> => {
+    if (symbolFilter.length === 0) return [];
+    
+    const transactions = allTransactions.filter(tx => symbolFilter.includes(tx.symbol));
+    const prices = await fetchPrices();
+    
+    if (transactions.length === 0) {
+      return [];
+    }
+
+    // Sort transactions by timestamp
+    const sortedTransactions = transactions
+      .filter(tx => tx.side === "BUY")
+      .sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+
+    // Helper functions for decimal arithmetic
+    const addDecimals = (a: string, b: string): string => {
+      const aNum = parseFloat(a);
+      const bNum = parseFloat(b);
+      const result = aNum + bNum;
+      return result.toFixed(8);
+    };
+
+    const multiplyDecimals = (a: string, b: string): string => {
+      const aNum = parseFloat(a);
+      const bNum = parseFloat(b);
+      const result = aNum * bNum;
+      return result.toFixed(8);
+    };
+
+    const subtractDecimals = (a: string, b: string): string => {
+      const aNum = parseFloat(a);
+      const bNum = parseFloat(b);
+      const result = aNum - bNum;
+      return result.toFixed(8);
+    };
+
+    // Group transactions by day to create data points
+    const dailyGroups = new Map<string, Transaction[]>();
+    
+    for (const tx of sortedTransactions) {
+      const date = new Date(tx.ts).toISOString().split("T")[0]; // YYYY-MM-DD
+      if (!dailyGroups.has(date)) {
+        dailyGroups.set(date, []);
+      }
+      dailyGroups.get(date)!.push(tx);
+    }
+
+    const chartData: ChartDataPoint[] = [];
+    const runningPositions = new Map<string, { qty: string; cost: string }>();
+    let runningInvested = "0";
+
+    // Process each day
+    for (const [date, dayTransactions] of Array.from(dailyGroups.entries()).sort()) {
+      // Process all transactions for this day
+      for (const tx of dayTransactions) {
+        runningInvested = addDecimals(runningInvested, tx.quote_spent);
+        
+        const existing = runningPositions.get(tx.symbol) || { qty: "0", cost: "0" };
+        runningPositions.set(tx.symbol, {
+          qty: addDecimals(existing.qty, tx.qty),
+          cost: addDecimals(existing.cost, tx.quote_spent)
+        });
+      }
+
+      // Calculate market value using the latest available price for each symbol at this date
+      let totalMarketValue = "0";
+      const endOfDay = new Date(date + "T23:59:59Z");
+      
+      for (const [symbol, position] of runningPositions.entries()) {
+        // Find the most recent price for this symbol up to this date
+        const relevantPrices = prices
+          .filter(p => p.symbol === symbol && new Date(p.ts) <= endOfDay)
+          .sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
+        
+        if (relevantPrices.length > 0) {
+          const latestPrice = relevantPrices[0].price;
+          const marketValue = multiplyDecimals(position.qty, latestPrice);
+          totalMarketValue = addDecimals(totalMarketValue, marketValue);
+        }
+      }
+
+      const unrealizedPL = subtractDecimals(totalMarketValue, runningInvested);
+      
+      chartData.push({
+        date,
+        invested: parseFloat(runningInvested),
+        marketValue: parseFloat(totalMarketValue),
+        unrealizedPL: parseFloat(unrealizedPL),
+        timestamp: date + "T12:00:00Z" // Noon UTC for consistent display
+      });
+    }
+
+    return chartData;
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await generateTimeSeriesFromTransactions();
-        setChartData(data);
-        
-        // Extract available symbols from transaction data
+        // Load all transactions and symbols first
         const transactions = await fetchTransactions();
+        setAllTransactions(transactions);
+        
         const symbols = Array.from(new Set(transactions.map(t => t.symbol))).sort();
         setAvailableSymbols(symbols);
         setSelectedSymbols(symbols); // Default to all symbols selected
+        
+        // Generate initial chart data with all symbols
+        const data = await generateTimeSeriesFromTransactions();
+        setChartData(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load chart data');
       } finally {
@@ -41,6 +142,22 @@ function Charts() {
 
     loadData();
   }, []);
+
+  // Regenerate chart data when selected symbols change
+  useEffect(() => {
+    if (allTransactions.length > 0 && availableSymbols.length > 0) {
+      const updateChartData = async () => {
+        try {
+          const filteredData = await generateFilteredTimeSeries(selectedSymbols);
+          setChartData(filteredData);
+        } catch (err) {
+          console.error('Failed to update chart data:', err);
+        }
+      };
+      
+      updateChartData();
+    }
+  }, [selectedSymbols, allTransactions]);
 
   const filterDataByTimeRange = (data: ChartDataPoint[]) => {
     if (timeRange === 'all') return data;
@@ -169,26 +286,26 @@ function Charts() {
         </div>
         {/* Current Stats */}
         {filteredChartData.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Invested</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].invested, baseCurrency)}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Invested</p>
             </div>
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Market Value</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].marketValue, baseCurrency)}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Market Value</p>
             </div>
-            <div className="text-center">
-              <p className={`text-lg font-semibold ${
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Unrealized P/L</p>
+              <p className={`text-xl font-bold ${
                 filteredChartData[filteredChartData.length - 1].unrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].unrealizedPL, baseCurrency)}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Unrealized P/L</p>
             </div>
           </div>
         )}

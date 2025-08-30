@@ -1,5 +1,8 @@
 import { PositionsData, PriceData, Transaction, Iteration, AppConfig, ComputedPortfolio, ComputedPosition } from '../types';
 
+// Re-export Transaction type for use in other components
+export type { Transaction };
+
 const getConfig = (): AppConfig => {
   const config = (window as any).__APP_CONFIG__;
   return {

@@ -136,26 +136,28 @@ function Dashboard() {
                       <div className="text-sm font-medium text-gray-900 dark:text-white">{position.symbol}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 dark:text-gray-300">{quantity.toFixed(6)}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-gray-300">
-                        {formatCurrency(avgCost, portfolio.base_currency)}
+                        {isNaN(quantity) || quantity === 0 ? '0.000000' : quantity.toFixed(6)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-gray-300">
-                        {formatCurrency(totalCost, portfolio.base_currency)}
+                        {isNaN(avgCost) || avgCost === 0 ? '$0.00' : formatCurrency(avgCost, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-gray-300">
-                        {lastPrice > 0 ? formatCurrency(lastPrice, portfolio.base_currency) : '-'}
+                        {isNaN(totalCost) || totalCost === 0 ? '$0.00' : formatCurrency(totalCost, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900 dark:text-gray-300">
-                        {marketValue > 0 ? formatCurrency(marketValue, portfolio.base_currency) : '-'}
+                        {isNaN(lastPrice) || lastPrice === 0 ? '-' : formatCurrency(lastPrice, portfolio.base_currency)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 dark:text-gray-300">
+                        {isNaN(marketValue) || marketValue === 0 ? '-' : formatCurrency(marketValue, portfolio.base_currency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
