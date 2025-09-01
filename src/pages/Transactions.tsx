@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Transaction } from '../types';
 import { fetchTransactions } from '../lib/dataReader';
 import { formatCurrency, formatDate } from '../lib/utils';
+import { useI18n } from '../lib/I18nContext';
 
 function Transactions() {
+  const { t } = useI18n();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,29 +67,29 @@ function Transactions() {
     <div className="space-y-6">
       {/* Summary Stats */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Transaction Summary</h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('tx.summaryTitle')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{filteredTransactions.length}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Total Transactions</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('tx.totalTransactions')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(totalSpent, 'USDC')}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Total Spent</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('tx.totalSpent')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {availableSymbols.length}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Assets Traded</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('tx.assetsTraded')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {avgBuyAmount > 0 ? formatCurrency(avgBuyAmount, 'USDC') : '-'}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Avg Buy Amount</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('tx.avgBuyAmount')}</p>
           </div>
         </div>
       </div>
@@ -95,19 +97,19 @@ function Transactions() {
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <h3 className="text-md font-medium text-gray-900 dark:text-white">Filter Transactions</h3>
+          <h3 className="text-md font-medium text-gray-900 dark:text-white">{t('tx.filtersTitle')}</h3>
           <select
             value={selectedSymbol}
             onChange={(e) => setSelectedSymbol(e.target.value)}
             className="block w-full sm:w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
           >
-            <option value="all">All Assets</option>
+            <option value="all">{t('tx.allAssets')}</option>
             {availableSymbols.map(symbol => (
               <option key={symbol} value={symbol}>{symbol}</option>
             ))}
           </select>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            Showing {filteredTransactions.length} of {transactions.length} transactions
+            {t('tx.showing')} {filteredTransactions.length} {t('tx.of')} {transactions.length} {t('tx.transactionsLower')}
           </div>
         </div>
       </div>
@@ -115,32 +117,32 @@ function Transactions() {
       {/* Transactions Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Transaction History</h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('tx.historyTitle')}</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Time
+                  {t('tx.th.time')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Asset
+                  {t('tx.th.asset')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Side
+                  {t('tx.th.side')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Price
+                  {t('tx.th.price')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Quantity
+                  {t('tx.th.quantity')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Total
+                  {t('tx.th.total')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Exchange
+                  {t('tx.th.exchange')}
                 </th>
               </tr>
             </thead>
