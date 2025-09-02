@@ -2,11 +2,15 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import Dashboard from './pages/Dashboard';
 import Charts from './pages/Charts';
 import Transactions from './pages/Transactions';
+import About from './pages/About';
 import { ThemeProvider } from './lib/ThemeContext';
 import ThemeToggle from './components/ThemeToggle';
+import { I18nProvider, useI18n } from './lib/I18nContext';
+import LanguageToggle from './components/LanguageToggle';
 
 function Navigation() {
   const location = useLocation();
+  const { t } = useI18n();
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -29,7 +33,7 @@ function Navigation() {
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white'
                 }`}
               >
-                Dashboard
+                {t('nav.dashboard')}
               </Link>
               <Link
                 to="/charts"
@@ -39,7 +43,7 @@ function Navigation() {
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white'
                 }`}
               >
-                Charts
+                {t('nav.charts')}
               </Link>
               <Link
                 to="/transactions"
@@ -49,10 +53,23 @@ function Navigation() {
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white'
                 }`}
               >
-                Transactions
+                {t('nav.transactions')}
+              </Link>
+              <Link
+                to="/about"
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/about') 
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' 
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white'
+                }`}
+              >
+                {t('nav.about')}
               </Link>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>
@@ -64,20 +81,23 @@ function App() {
   const basename = import.meta.env.PROD ? '/dca-bot-dashboard_r2_claude' : '';
   
   return (
-    <ThemeProvider>
-      <Router basename={basename}>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <Navigation />
-          <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/charts" element={<Charts />} />
-              <Route path="/transactions" element={<Transactions />} />
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </ThemeProvider>
+    <I18nProvider>
+      <ThemeProvider>
+        <Router basename={basename}>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <Navigation />
+            <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/charts" element={<Charts />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/about" element={<About />} />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </ThemeProvider>
+    </I18nProvider>
   );
 }
 

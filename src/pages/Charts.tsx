@@ -11,9 +11,11 @@ import {
 } from 'recharts';
 import { ChartDataPoint, generateTimeSeriesFromTransactions, fetchTransactions, Transaction, fetchPrices } from '../lib/dataReader';
 import { formatCurrency, formatDateShort } from '../lib/utils';
+import { useI18n } from '../lib/I18nContext';
 
 
 function Charts() {
+  const { t, lang } = useI18n();
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -218,7 +220,7 @@ function Charts() {
   if (chartData.length === 0) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-        <p className="text-yellow-800">No chart data available</p>
+        <p className="text-yellow-800">{t('charts.empty')}</p>
       </div>
     );
   }
@@ -230,7 +232,7 @@ function Charts() {
       {/* Controls */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 mb-4">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Portfolio Performance</h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('charts.title')}</h2>
           
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Time Range Selector */}
@@ -245,7 +247,7 @@ function Charts() {
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  {range.toUpperCase()}
+                  {t(`charts.range.${range}`)}
                 </button>
               ))}
             </div>
@@ -257,12 +259,12 @@ function Charts() {
         {/* Symbol Filter */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Assets</h3>
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('charts.filter.title')}</h3>
             <button
               onClick={toggleAllSymbols}
               className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
             >
-              {selectedSymbols.length === availableSymbols.length ? 'Deselect All' : 'Select All'}
+              {selectedSymbols.length === availableSymbols.length ? t('charts.filter.deselectAll') : t('charts.filter.selectAll')}
             </button>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -281,26 +283,28 @@ function Charts() {
             ))}
           </div>
           <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            {selectedSymbols.length} of {availableSymbols.length} assets selected
+            {lang === 'zh-TW'
+              ? `已選 ${selectedSymbols.length} ／ ${availableSymbols.length} 個資產`
+              : `${selectedSymbols.length} of ${availableSymbols.length} assets selected`}
           </div>
         </div>
         {/* Current Stats */}
         {filteredChartData.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total Invested</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('kpi.totalInvested')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].invested, baseCurrency)}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Market Value</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('kpi.marketValue')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
                 {formatCurrency(filteredChartData[filteredChartData.length - 1].marketValue, baseCurrency)}
               </p>
             </div>
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Unrealized P/L</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('kpi.unrealizedPL')}</p>
               <p className={`text-xl font-bold ${
                 filteredChartData[filteredChartData.length - 1].unrealizedPL >= 0 ? 'text-green-600' : 'text-red-600'
               }`}>
@@ -341,7 +345,7 @@ function Charts() {
                 dataKey="invested"
                 stroke="#3b82f6"
                 strokeWidth={2}
-                name="Invested"
+                name={t('charts.legend.invested')}
                 dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
               />
               <Line
@@ -349,7 +353,7 @@ function Charts() {
                 dataKey="marketValue"
                 stroke="#10b981"
                 strokeWidth={2}
-                name="Market Value"
+                name={t('charts.legend.marketValue')}
                 dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
               />
               <Line
@@ -357,7 +361,7 @@ function Charts() {
                 dataKey="unrealizedPL"
                 stroke="#f59e0b"
                 strokeWidth={2}
-                name="Unrealized P/L"
+                name={t('charts.legend.unrealizedPL')}
                 dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
               />
             </LineChart>

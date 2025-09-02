@@ -2,11 +2,17 @@ import { useState, useEffect } from 'react';
 import { ComputedPortfolio } from '../types';
 import { computePortfolioFromTransactions } from '../lib/dataReader';
 import { formatCurrency, formatPLColor, formatDate } from '../lib/utils';
+import { Link } from 'react-router-dom';
+import { useI18n } from '../lib/I18nContext';
 
 function Dashboard() {
   const [portfolio, setPortfolio] = useState<ComputedPortfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showBrief, setShowBrief] = useState(true);
+  const { t } = useI18n();
+
+  const BRIEF_DISMISS_KEY = 'dca.aboutBriefDismissed';
 
   useEffect(() => {
     const loadData = async () => {
@@ -24,6 +30,26 @@ function Dashboard() {
     const interval = setInterval(loadData, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem(BRIEF_DISMISS_KEY);
+      if (dismissed === 'true') {
+        setShowBrief(false);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
+  const dismissBrief = () => {
+    try {
+      localStorage.setItem(BRIEF_DISMISS_KEY, 'true');
+    } catch {
+      // ignore storage errors
+    }
+    setShowBrief(false);
+  };
 
   if (loading) {
     return (
@@ -55,35 +81,50 @@ function Dashboard() {
   
   return (
     <div className="space-y-6">
+      {showBrief && (
+        <div className="relative bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+          <p className="text-sm text-blue-900 dark:text-blue-200">
+            {t('brief.text')}
+            <Link to="/about" className="ml-2 underline decoration-dotted hover:decoration-solid">{t('brief.learnMore')}</Link>
+          </p>
+          <button
+            aria-label="Dismiss"
+            onClick={dismissBrief}
+            className="absolute top-2 right-2 text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       {/* KPIs Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Portfolio Overview</h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('dashboard.title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(totalInvested, portfolio.base_currency)}
             </p>
-            <p className="text-sm text-gray-500">Total Invested</p>
+            <p className="text-sm text-gray-500">{t('kpi.totalInvested')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {formatCurrency(totalMarketValue, portfolio.base_currency)}
             </p>
-            <p className="text-sm text-gray-500">Market Value</p>
+            <p className="text-sm text-gray-500">{t('kpi.marketValue')}</p>
           </div>
           <div className="text-center">
             <p className={`text-2xl font-bold ${formatPLColor(totalUnrealizedPL)}`}>
               {totalUnrealizedPL >= 0 ? '+' : ''}{formatCurrency(totalUnrealizedPL, portfolio.base_currency)}
             </p>
-            <p className="text-sm text-gray-500">Unrealized P/L</p>
+            <p className="text-sm text-gray-500">{t('kpi.unrealizedPL')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {portfolio.positions.length}
             </p>
-            <p className="text-sm text-gray-500">Assets</p>
+            <p className="text-sm text-gray-500">{t('dashboard.assets')}</p>
             <p className="text-xs text-gray-500 mt-1">
-              Updated: {formatDate(portfolio.last_updated)}
+              {t('dashboard.updated')}: {formatDate(portfolio.last_updated)}
             </p>
           </div>
         </div>
@@ -92,32 +133,32 @@ function Dashboard() {
       {/* Positions Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">Current Positions</h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">{t('dashboard.currentPositions')}</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Asset
+                  {t('dashboard.asset')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Quantity
+                  {t('dashboard.quantity')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Avg Cost
+                  {t('dashboard.avgCost')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Total Cost
+                  {t('dashboard.totalCost')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Last Price
+                  {t('dashboard.lastPrice')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Market Value
+                  {t('dashboard.marketValueCol')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  P/L
+                  {t('dashboard.pl')}
                 </th>
               </tr>
             </thead>
