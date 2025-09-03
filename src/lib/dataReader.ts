@@ -3,10 +3,18 @@ import { PositionsData, PriceData, Transaction, Iteration, AppConfig, ComputedPo
 // Re-export Transaction type for use in other components
 export type { Transaction };
 
+const joinUrl = (base: string, path: string): string => {
+  const b = base.replace(/\/+$/, '');
+  const p = path.replace(/^\/+/, '');
+  return `${b}/${p}`;
+};
+
 const getConfig = (): AppConfig => {
   const config = (window as any).__APP_CONFIG__;
+  const baseUrl = (import.meta.env?.BASE_URL as string) || '/';
+  const defaultData = joinUrl(baseUrl, 'data');
   return {
-    dataBasePath: config?.dataBasePath || (import.meta.env?.VITE_DATA_BASE_PATH as string) || '/data'
+    dataBasePath: config?.dataBasePath || (import.meta.env?.VITE_DATA_BASE_PATH as string) || defaultData
   };
 };
 

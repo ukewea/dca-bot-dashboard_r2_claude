@@ -80,7 +80,9 @@ function Navigation() {
 }
 
 function App() {
-  const basename = import.meta.env.PROD ? '/dca-bot-dashboard_r2_claude' : '';
+  // Use Vite's injected BASE_URL for subpath hosting; strip trailing slash
+  const rawBase = import.meta.env.BASE_URL || '/';
+  const basename = rawBase === '/' ? '' : rawBase.replace(/\/$/, '');
   
   return (
     <I18nProvider>
