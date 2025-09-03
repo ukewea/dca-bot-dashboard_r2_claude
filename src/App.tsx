@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import Charts from './pages/Charts';
-import Transactions from './pages/Transactions';
-import About from './pages/About';
+import { lazy, Suspense } from 'react';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Charts = lazy(() => import('./pages/Charts'));
+const Transactions = lazy(() => import('./pages/Transactions'));
+const About = lazy(() => import('./pages/About'));
 import { ThemeProvider } from './lib/ThemeContext';
 import ThemeToggle from './components/ThemeToggle';
 import { I18nProvider, useI18n } from './lib/I18nContext';
@@ -87,12 +89,14 @@ function App() {
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Navigation />
             <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/charts" element={<Charts />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/about" element={<About />} />
-              </Routes>
+              <Suspense fallback={<div className="flex justify-center items-center h-64"><div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div></div>}>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/charts" element={<Charts />} />
+                  <Route path="/transactions" element={<Transactions />} />
+                  <Route path="/about" element={<About />} />
+                </Routes>
+              </Suspense>
             </main>
           </div>
         </Router>
