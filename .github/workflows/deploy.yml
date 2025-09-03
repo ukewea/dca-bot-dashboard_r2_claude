@@ -34,10 +34,9 @@ jobs:
       run: npm run lint
       continue-on-error: true
       
-    - name: Build for production
-      run: npm run build:ci
+    - name: Build for GitHub Pages
+      run: npm run build:ci -- --mode ghpages
       env:
-        VITE_DATA_BASE_PATH: '/dca-bot-dashboard_r2_claude/data'
         NODE_ENV: 'production'
         
     - name: Copy sample data to dist

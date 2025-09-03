@@ -1,6 +1,49 @@
 # 🚀 Deployment Guide - Crypto DCA Dashboard
 
-## GitHub Pages Deployment (Recommended)
+## Cloudflare Pages Deployment (Recommended)
+
+### Prerequisites
+- Cloudflare account
+- GitHub repository
+
+### Setup Instructions
+
+1. **Create Cloudflare Pages Project**:
+   - Go to Cloudflare Dashboard → Pages
+   - Click "Create a project" → "Connect to Git"
+   - Select your repository
+   - Don't connect yet - we'll use GitHub Actions
+
+2. **Get Required Secrets**:
+   - **Account ID**: Cloudflare Dashboard → Right sidebar
+   - **API Token**: Cloudflare Dashboard → My Profile → API Tokens → Create Token
+     - Use "Custom token" template
+     - Permissions: `Cloudflare Pages:Edit`, `Account:Read`, `Zone:Read`
+   - **Project Name**: Create a project in Cloudflare Pages first, note the name
+
+3. **Configure GitHub Secrets**:
+   - Go to GitHub repo → Settings → Secrets and variables → Actions
+   - Add these secrets:
+     - `CLOUDFLARE_API_TOKEN`: Your API token
+     - `CLOUDFLARE_ACCOUNT_ID`: Your account ID
+     - `CLOUDFLARE_PROJECT_NAME`: Your project name
+
+4. **Deploy**:
+   - Push to `main` branch for automatic deployment
+   - Or manually trigger via Actions tab → "Deploy to Cloudflare Pages"
+
+5. **Access your dashboard**:
+   - URL: `https://your-project-name.pages.dev`
+   - Custom domain can be configured in Cloudflare Pages settings
+
+### Environment Configuration
+- **Build mode**: `--mode cfpages` (uses `.env.cfpages`)
+- **Base path**: `/` (root domain)
+- **Data path**: `/data` (automatically derived)
+
+---
+
+## GitHub Pages Deployment (Alternative)
 
 ### Prerequisites
 - GitHub repository named `dca-bot-dashboard_r2_claude`
@@ -46,10 +89,19 @@ The GitHub Actions workflow (`/.github/workflows/deploy.yml`) automatically:
 - ✅ Copies sample data files
 - ✅ Deploys to GitHub Pages
 
-### Environment Variables Set:
-- `VITE_DATA_BASE_PATH: '/dca-bot-dashboard_r2_claude/data'`
-- `NODE_ENV: 'production'`
-- `base: '/dca-bot-dashboard_r2_claude/'` (Vite config)
+### Environment Variables and Configuration:
+The deployment uses mode-specific configuration:
+- **Build mode**: `--mode ghpages` (set in GitHub Actions)
+- **Base path**: Uses `.env.ghpages` file with `VITE_BASE_PATH=/dca-bot-dashboard_r2_claude/`
+- **Data path**: Automatically derived from base path (defaults to `/dca-bot-dashboard_r2_claude/data`)
+- **NODE_ENV**: Set to `production` in build environment
+
+### Available .env Files:
+- `.env.cfpages` - Used for Cloudflare Pages deployment (root path)
+- `.env.ghpages` - Used for GitHub Pages deployment (subpath)
+- `.env.development` - Used for local development (root path)
+- `.env.production` - Used for custom domain deployment (root path)
+- `.env.example` - Documentation of all configuration options
 
 ## 📊 Data File Management
 
