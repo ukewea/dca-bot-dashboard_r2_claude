@@ -145,7 +145,7 @@ The bot should update files in the `public/data/` directory, then commit and pus
 
 ### Static File Server
 ```bash
-npm run build
+yarn build
 # Serve the dist/ directory with any static file server
 # Make sure data files are accessible at /data/ path
 ```
@@ -200,7 +200,7 @@ EXPOSE 80
 ### Build Fails
 1. Check GitHub Actions logs
 2. Verify all dependencies in package.json
-3. Test build locally: `npm run build:ci`
+3. Test build locally: `yarn build:ci`
 
 ### Page Not Loading
 1. Verify GitHub Pages is enabled
