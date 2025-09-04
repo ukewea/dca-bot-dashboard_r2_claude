@@ -34,12 +34,11 @@ jobs:
       run: yarn lint
       continue-on-error: true
       
-    - name: Load environment and build for GitHub Pages  
-      run: |
-        source .env.ghpages
-        yarn build:ci --mode ghpages
+    - name: Build for GitHub Pages
+      run: yarn build:ci --mode ghpages
       env:
         NODE_ENV: 'production'
+        VITE_BASE_PATH: '/dca-bot-dashboard_r2_claude/'
         
     - name: Copy sample data to dist
       run: yarn setup-data
