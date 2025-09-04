@@ -38,6 +38,7 @@ jobs:
       run: yarn build:ci --mode ghpages
       env:
         NODE_ENV: 'production'
+        VITE_BASE_PATH: '/dca-bot-dashboard_r2_claude/'
         
     - name: Copy sample data to dist
       run: yarn setup-data
