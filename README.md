@@ -7,13 +7,13 @@ A lightweight web UI that renders simulated DCA portfolio data from files writte
 ### Development
 ```bash
 # Install dependencies
-npm install
+yarn install
 
 # Start development server
-npm run dev
+yarn dev
 
 # Build for production
-npm run build
+yarn build
 ```
 
 ### Production Deployment
